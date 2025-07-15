@@ -40,6 +40,18 @@ app.get("/", async (req, res) => {
   });
 });
 
+// Health check endpoint for production monitoring
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "OK",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || "development",
+    version: require("./package.json").version,
+    database: mongoose.connection.readyState === 1 ? "connected" : "disconnected"
+  });
+});
+
 app.use("/user", userRoute);
 app.use("/blog", blogRoute);
 

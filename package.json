@@ -1,15 +1,42 @@
 {
-  "name": "youtube-blog",
+  "name": "blogify",
   "version": "1.0.0",
-  "description": "",
+  "description": "A modern blog application built with Node.js, Express, and MongoDB",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "dev": "nodemon app.js"
+    "dev": "nodemon app.js",
+    "build": "npm install --production",
+    "build:full": "npm ci && npm run test:ci",
+    "test": "echo \"No tests specified yet\" && exit 0",
+    "test:ci": "npm run test",
+    "lint": "echo \"Linting not configured yet\" && exit 0",
+    "lint:fix": "echo \"Linting not configured yet\" && exit 0",
+    "clean": "rm -rf node_modules package-lock.json",
+    "clean:uploads": "find public/uploads -type f ! -name '.gitkeep' -delete",
+    "setup": "npm install && npm run build",
+    "prod": "NODE_ENV=production npm start",
+    "staging": "NODE_ENV=staging npm start",
+    "health": "curl -f http://localhost:${PORT:-8000}/health || exit 1",
+    "docker:build": "docker build -t blogify .",
+    "docker:run": "docker run -p 8000:8000 --env-file .env blogify",
+    "deploy:check": "npm run lint && npm run test && npm run build",
+    "postinstall": "echo \"Installation completed successfully\"",
+    "prestart": "echo \"Starting Blogify application...\""
   },
-  "author": "",
+  "keywords": [
+    "blog",
+    "nodejs",
+    "express",
+    "mongodb",
+    "ejs",
+    "authentication",
+    "jwt"
+  ],
+  "author": "Your Name <your.email@example.com>",
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
   },
   "license": "ISC",
   "dependencies": {
@@ -23,5 +50,13 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.20"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/blogify.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/blogify/issues"
+  },
+  "homepage": "https://github.com/yourusername/blogify#readme"
 }
