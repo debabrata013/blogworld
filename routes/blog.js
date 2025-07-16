@@ -1,23 +1,9 @@
 const { Router } = require("express");
-const multer = require("multer");
-const path = require("path");
-
 const Blog = require("../models/blog");
 const Comment = require("../models/comment");
+const { upload } = require("../services/s3Service");
 
 const router = Router();
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, path.resolve(`./public/uploads/`));
-  },
-  filename: function (req, file, cb) {
-    const fileName = `${Date.now()}-${file.originalname}`;
-    cb(null, fileName);
-  },
-});
-
-const upload = multer({ storage: storage });
 
 router.get("/add-new", (req, res) => {
   return res.render("addBlog", {
@@ -53,14 +39,26 @@ router.post("/comment/:blogId", async (req, res) => {
 });
 
 router.post("/", upload.single("coverImage"), async (req, res) => {
-  const { title, body } = req.body;
-  const blog = await Blog.create({
-    body,
-    title,
-    createdBy: req.user._id,
-    coverImageURL: `/uploads/${req.file.filename}`,
-  });
-  return res.redirect(`/blog/${blog._id}`);
+  try {
+    const { title, body } = req.body;
+    
+    // Check if file was uploaded
+    if (!req.file) {
+      return res.status(400).send("Cover image is required");
+    }
+    
+    const blog = await Blog.create({
+      body,
+      title,
+      createdBy: req.user._id,
+      coverImageURL: req.file.location, // S3 URL
+    });
+    
+    return res.redirect(`/blog/${blog._id}`);
+  } catch (error) {
+    console.error("Error creating blog:", error);
+    return res.status(500).send("Error creating blog post");
+  }
 });
 
 module.exports = router;
