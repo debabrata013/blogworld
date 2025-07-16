@@ -48,15 +48,11 @@ router.post("/comment/:blogId", async (req, res) => {
   }
 });
 
+// Alternative upload route using direct S3 upload
 router.post("/", upload.single("coverImage"), async (req, res) => {
   try {
     console.log("📝 Creating new blog post...");
-    console.log("File info:", req.file ? {
-      originalname: req.file.originalname,
-      size: req.file.size,
-      mimetype: req.file.mimetype
-    } : "No file uploaded");
-
+    
     const { title, body } = req.body;
     
     // Check if required fields are provided
@@ -71,7 +67,7 @@ router.post("/", upload.single("coverImage"), async (req, res) => {
     
     console.log("📤 Uploading to S3...");
     
-    // Upload file to S3 using direct method
+    // Upload file to S3
     const s3Result = await uploadToS3(req.file);
     
     console.log("✅ File uploaded to S3:", s3Result.location);
@@ -110,8 +106,7 @@ router.get("/test/s3", async (req, res) => {
       success: isConnected,
       message: isConnected ? "S3 connection successful" : "S3 connection failed",
       bucket: process.env.AWS_S3_BUCKET_NAME,
-      region: process.env.AWS_REGION,
-      uploadMethod: "Direct S3 Upload"
+      region: process.env.AWS_REGION
     });
   } catch (error) {
     res.status(500).json({
